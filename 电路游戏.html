@@ -1,0 +1,1519 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>电路模拟实验室</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background: linear-gradient(135deg, #1a2a3a 0%, #2c3e50 100%);
+            color: #ecf0f1;
+            min-height: 100vh;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        header {
+            text-align: center;
+            padding: 20px;
+            margin-bottom: 20px;
+        }
+        
+        h1 {
+            font-size: 2.8rem;
+            margin-bottom: 10px;
+            color: #3498db;
+            text-shadow: 0 2px 5px rgba(0,0,0,0.3);
+        }
+        
+        .subtitle {
+            font-size: 1.2rem;
+            opacity: 0.9;
+            max-width: 800px;
+            margin: 0 auto;
+            line-height: 1.6;
+        }
+        
+        .container {
+            display: flex;
+            flex: 1;
+            gap: 20px;
+            flex-wrap: wrap;
+        }
+        
+        .toolbox {
+            flex: 1;
+            min-width: 300px;
+            background: rgba(44, 62, 80, 0.9);
+            border-radius: 15px;
+            padding: 20px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.3);
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+        
+        .workspace {
+            flex: 3;
+            min-width: 500px;
+            background: rgba(25, 35, 45, 0.9);
+            border-radius: 15px;
+            padding: 20px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.3);
+            position: relative;
+            overflow: hidden;
+            min-height: 700px;
+        }
+        
+        .panel-title {
+            font-size: 1.5rem;
+            font-weight: 600;
+            color: #3498db;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .panel-title i {
+            font-size: 1.3rem;
+        }
+        
+        .components {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+        
+        .component-item {
+            background: #2c3e50;
+            border-radius: 10px;
+            padding: 15px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            cursor: grab;
+            transition: all 0.3s ease;
+            border: 2px solid transparent;
+        }
+        
+        .component-item:hover {
+            transform: translateY(-5px);
+            border-color: #3498db;
+            box-shadow: 0 5px 15px rgba(52, 152, 219, 0.3);
+        }
+        
+        .component-icon {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+            color: #3498db;
+        }
+        
+        .component-name {
+            font-size: 1rem;
+            font-weight: 500;
+        }
+        
+        .controls {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+        
+        .control-group {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+        
+        .control-title {
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: #ecf0f1;
+        }
+        
+        .slider-container {
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+        }
+        
+        .slider-label {
+            display: flex;
+            justify-content: space-between;
+        }
+        
+        .slider-value {
+            font-weight: 600;
+            color: #3498db;
+        }
+        
+        input[type="range"] {
+            width: 100%;
+            height: 8px;
+            -webkit-appearance: none;
+            background: #34495e;
+            border-radius: 5px;
+            outline: none;
+        }
+        
+        input[type="range"]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            width: 20px;
+            height: 20px;
+            background: #3498db;
+            border-radius: 50%;
+            cursor: pointer;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.3);
+        }
+        
+        .fault-controls {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+        
+        .fault-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 10px;
+            background: #34495e;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+        
+        .fault-item:hover {
+            background: #3d566e;
+        }
+        
+        .fault-item.active {
+            background: #e74c3c;
+        }
+        
+        .circuit-info {
+            background: #2c3e50;
+            border-radius: 10px;
+            padding: 15px;
+            margin-top: 20px;
+        }
+        
+        .info-title {
+            font-size: 1.2rem;
+            font-weight: 600;
+            margin-bottom: 10px;
+            color: #3498db;
+        }
+        
+        .info-content {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+        
+        .info-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 5px 0;
+            border-bottom: 1px solid #3c4b5a;
+        }
+        
+        .info-label {
+            color: #bdc3c7;
+        }
+        
+        .info-value {
+            font-weight: 600;
+            color: #2ecc71;
+        }
+        
+        .circuit-status {
+            font-size: 1.1rem;
+            padding: 10px;
+            border-radius: 8px;
+            text-align: center;
+            margin-top: 10px;
+            background: #34495e;
+        }
+        
+        .circuit-open {
+            color: #e74c3c;
+            border-left: 4px solid #e74c3c;
+        }
+        
+        .circuit-closed {
+            color: #2ecc71;
+            border-left: 4px solid #2ecc71;
+        }
+        
+        #workspace-canvas {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 1;
+        }
+        
+        .workspace-components {
+            position: relative;
+            z-index: 2;
+        }
+        
+        .circuit-element {
+            position: absolute;
+            cursor: move;
+            user-select: none;
+            z-index: 10;
+        }
+        
+        .element-content {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 15px;
+            background: rgba(44, 62, 80, 0.95);
+            border-radius: 10px;
+            border: 2px solid #3498db;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+            transition: all 0.3s ease;
+            min-width: 120px;
+            min-height: 100px;
+        }
+        
+        .element-icon {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+            color: #3498db;
+        }
+        
+        .element-name {
+            font-size: 1rem;
+            font-weight: 500;
+            margin-bottom: 5px;
+        }
+        
+        .element-value {
+            font-size: 0.9rem;
+            color: #2ecc71;
+        }
+        
+        .connector {
+            position: absolute;
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            background: #f1c40f;
+            border: 2px solid #f39c12;
+            cursor: crosshair;
+            z-index: 5;
+        }
+        
+        .connector:hover {
+            transform: scale(1.3);
+        }
+        
+        .bulb-on {
+            color: #f1c40f !important;
+            text-shadow: 0 0 10px #f1c40f, 0 0 20px #f1c40f;
+            animation: bulbGlow 1s infinite alternate;
+        }
+        
+        @keyframes bulbGlow {
+            from { opacity: 0.8; }
+            to { opacity: 1; }
+        }
+        
+        .motor-on {
+            color: #2ecc71 !important;
+            animation: motorSpin 2s infinite linear;
+        }
+        
+        @keyframes motorSpin {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+        
+        .element-selected {
+            border-color: #f1c40f !important;
+            box-shadow: 0 0 15px rgba(241, 196, 15, 0.5) !important;
+        }
+        
+        .connection-line {
+            stroke: #3498db;
+            stroke-width: 3;
+            pointer-events: none;
+        }
+        
+        .connection-line.connected {
+            stroke: #2ecc71;
+            stroke-width: 4;
+        }
+        
+        .instructions {
+            background: rgba(44, 62, 80, 0.9);
+            border-radius: 15px;
+            padding: 25px;
+            margin-top: 30px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.3);
+        }
+        
+        .instructions h3 {
+            color: #3498db;
+            margin-bottom: 15px;
+            font-size: 1.5rem;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .instructions-list {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 15px;
+        }
+        
+        .instruction-item {
+            display: flex;
+            align-items: flex-start;
+            gap: 10px;
+            padding: 12px;
+            background: #34495e;
+            border-radius: 10px;
+        }
+        
+        .instruction-item i {
+            color: #3498db;
+            margin-top: 3px;
+            flex-shrink: 0;
+        }
+        
+        .btn {
+            padding: 12px 20px;
+            border: none;
+            border-radius: 8px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            transition: all 0.3s ease;
+            margin-top: 10px;
+        }
+        
+        .btn-primary {
+            background: #3498db;
+            color: white;
+        }
+        
+        .btn-primary:hover {
+            background: #2980b9;
+            transform: translateY(-3px);
+        }
+        
+        .btn-danger {
+            background: #e74c3c;
+            color: white;
+        }
+        
+        .btn-danger:hover {
+            background: #c0392b;
+            transform: translateY(-3px);
+        }
+        
+        .clear-btn {
+            background: #9b59b6;
+            color: white;
+        }
+        
+        .clear-btn:hover {
+            background: #8e44ad;
+            transform: translateY(-3px);
+        }
+        
+        @media (max-width: 1100px) {
+            .container {
+                flex-direction: column;
+            }
+            
+            .toolbox, .workspace {
+                width: 100%;
+                min-width: 100%;
+            }
+            
+            .workspace {
+                min-height: 600px;
+            }
+        }
+        
+        @media (max-width: 600px) {
+            h1 {
+                font-size: 2rem;
+            }
+            
+            .components {
+                grid-template-columns: repeat(2, 1fr);
+            }
+            
+            .workspace {
+                min-height: 500px;
+            }
+        }
+        
+        .connection-point {
+            position: absolute;
+            width: 16px;
+            height: 16px;
+            border-radius: 50%;
+            background: #e74c3c;
+            border: 2px solid #c0392b;
+            cursor: pointer;
+            z-index: 15;
+        }
+        
+        .connection-point.connected {
+            background: #2ecc71;
+            border-color: #27ae60;
+        }
+        
+        .connection-menu {
+            position: absolute;
+            background: #2c3e50;
+            border-radius: 8px;
+            padding: 10px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.5);
+            z-index: 100;
+            display: none;
+        }
+        
+        .connection-option {
+            padding: 8px 15px;
+            cursor: pointer;
+            border-radius: 5px;
+            transition: background 0.2s;
+        }
+        
+        .connection-option:hover {
+            background: #3498db;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1><i class="fas fa-bolt"></i> 电路模拟实验室</h1>
+        <p class="subtitle">一个交互式电路模拟器，支持自由组合电路元件并观察电路行为。拖动元件、连接导线、设置故障，探索电路的工作原理。</p>
+    </header>
+    
+    <div class="container">
+        <div class="toolbox">
+            <div class="components-panel">
+                <div class="panel-title"><i class="fas fa-toolbox"></i> 元件工具箱</div>
+                <div class="components">
+                    <div class="component-item" data-type="battery" data-voltage="9">
+                        <div class="component-icon"><i class="fas fa-battery-full"></i></div>
+                        <div class="component-name">电源 (9V)</div>
+                    </div>
+                    <div class="component-item" data-type="switch">
+                        <div class="component-icon"><i class="fas fa-toggle-on"></i></div>
+                        <div class="component-name">开关</div>
+                    </div>
+                    <div class="component-item" data-type="bulb" data-resistance="10">
+                        <div class="component-icon"><i class="fas fa-lightbulb"></i></div>
+                        <div class="component-name">灯泡 (10Ω)</div>
+                    </div>
+                    <div class="component-item" data-type="resistor" data-resistance="50">
+                        <div class="component-icon"><i class="fas fa-resistance"></i></div>
+                        <div class="component-name">滑动变阻器</div>
+                    </div>
+                    <div class="component-item" data-type="motor" data-resistance="20">
+                        <div class="component-icon"><i class="fas fa-cog"></i></div>
+                        <div class="component-name">电动机 (20Ω)</div>
+                    </div>
+                    <div class="component-item" data-type="voltmeter">
+                        <div class="component-icon"><i class="fas fa-bolt"></i></div>
+                        <div class="component-name">电压表</div>
+                    </div>
+                    <div class="component-item" data-type="ammeter">
+                        <div class="component-icon"><i class="fas fa-tachometer-alt"></i></div>
+                        <div class="component-name">电流表</div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="controls">
+                <div class="control-group">
+                    <div class="control-title">电源电压</div>
+                    <div class="slider-container">
+                        <div class="slider-label">
+                            <span>电压值</span>
+                            <span class="slider-value" id="voltage-value">9V</span>
+                        </div>
+                        <input type="range" id="voltage-slider" min="1" max="24" value="9">
+                    </div>
+                </div>
+                
+                <div class="control-group">
+                    <div class="control-title">滑动变阻器</div>
+                    <div class="slider-container">
+                        <div class="slider-label">
+                            <span>电阻值</span>
+                            <span class="slider-value" id="resistance-value">50Ω</span>
+                        </div>
+                        <input type="range" id="resistance-slider" min="1" max="100" value="50">
+                    </div>
+                </div>
+                
+                <div class="control-group">
+                    <div class="control-title">故障设置</div>
+                    <div class="fault-controls">
+                        <div class="fault-item" data-fault="none">
+                            <i class="fas fa-check-circle"></i>
+                            <span>无故障</span>
+                        </div>
+                        <div class="fault-item" data-fault="open-circuit">
+                            <i class="fas fa-unlink"></i>
+                            <span>断路故障</span>
+                        </div>
+                        <div class="fault-item" data-fault="short-circuit">
+                            <i class="fas fa-exchange-alt"></i>
+                            <span>短路故障</span>
+                        </div>
+                        <div class="fault-item" data-fault="bulb-burned">
+                            <i class="fas fa-fire"></i>
+                            <span>灯泡烧坏</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <button class="btn btn-danger" id="clear-circuit">
+                    <i class="fas fa-trash-alt"></i> 清空电路
+                </button>
+                
+                <button class="btn clear-btn" id="clear-connections">
+                    <i class="fas fa-unlink"></i> 清除所有连接
+                </button>
+            </div>
+            
+            <div class="circuit-info">
+                <div class="info-title"><i class="fas fa-info-circle"></i> 电路信息</div>
+                <div class="info-content">
+                    <div class="info-item">
+                        <span class="info-label">电路状态:</span>
+                        <span class="info-value" id="circuit-state">开路</span>
+                    </div>
+                    <div class="info-item">
+                        <span class="info-label">总电阻:</span>
+                        <span class="info-value" id="total-resistance">0 Ω</span>
+                    </div>
+                    <div class="info-item">
+                        <span class="info-label">总电流:</span>
+                        <span class="info-value" id="total-current">0 A</span>
+                    </div>
+                    <div class="info-item">
+                        <span class="info-label">总电压:</span>
+                        <span class="info-value" id="total-voltage">0 V</span>
+                    </div>
+                    <div class="info-item">
+                        <span class="info-label">电路功率:</span>
+                        <span class="info-value" id="total-power">0 W</span>
+                    </div>
+                </div>
+                <div class="circuit-status circuit-open" id="circuit-status">
+                    <i class="fas fa-times-circle"></i> 电路未接通
+                </div>
+            </div>
+        </div>
+        
+        <div class="workspace" id="workspace">
+            <canvas id="workspace-canvas"></canvas>
+            <div class="workspace-components" id="workspace-components">
+                <!-- 动态添加的电路元件将出现在这里 -->
+            </div>
+        </div>
+    </div>
+    
+    <div class="instructions">
+        <h3><i class="fas fa-graduation-cap"></i> 使用说明</h3>
+        <div class="instructions-list">
+            <div class="instruction-item">
+                <i class="fas fa-mouse-pointer"></i>
+                <div><strong>添加元件</strong>: 从左侧工具箱拖动元件到工作区</div>
+            </div>
+            <div class="instruction-item">
+                <i class="fas fa-arrows-alt"></i>
+                <div><strong>移动元件</strong>: 拖动元件到工作区的任意位置</div>
+            </div>
+            <div class="instruction-item">
+                <i class="fas fa-link"></i>
+                <div><strong>连接元件</strong>: 点击元件的连接点，然后点击另一个元件的连接点进行连接</div>
+            </div>
+            <div class="instruction-item">
+                <i class="fas fa-sliders-h"></i>
+                <div><strong>调整参数</strong>: 使用左侧的控制面板调整电源电压和滑动变阻器阻值</div>
+            </div>
+            <div class="instruction-item">
+                <i class="fas fa-bug"></i>
+                <div><strong>设置故障</strong>: 在故障设置区域选择不同的故障类型，观察电路行为变化</div>
+            </div>
+            <div class="instruction-item">
+                <i class="fas fa-bolt"></i>
+                <div><strong>观察现象</strong>: 电路接通时，灯泡会亮起，电动机转动，仪表显示读数</div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // 电路模拟器核心类
+        class CircuitSimulator {
+            constructor() {
+                this.elements = [];
+                this.connections = [];
+                this.selectedElement = null;
+                this.connectionInProgress = false;
+                this.connectionStartPoint = null;
+                this.faultType = 'none';
+                this.canvas = document.getElementById('workspace-canvas');
+                this.ctx = this.canvas.getContext('2d');
+                this.workspace = document.getElementById('workspace');
+                this.workspaceComponents = document.getElementById('workspace-components');
+                
+                // 初始化
+                this.initCanvas();
+                this.setupEventListeners();
+                this.setupComponentDrag();
+                this.setupFaultControls();
+                this.setupSliders();
+                this.setupButtons();
+                this.addDefaultCircuit();
+                
+                // 开始模拟循环
+                this.simulate();
+            }
+            
+            initCanvas() {
+                // 设置Canvas尺寸
+                this.resizeCanvas();
+                window.addEventListener('resize', () => this.resizeCanvas());
+            }
+            
+            resizeCanvas() {
+                const rect = this.workspace.getBoundingClientRect();
+                this.canvas.width = rect.width;
+                this.canvas.height = rect.height;
+                this.drawConnections();
+            }
+            
+            setupEventListeners() {
+                // 点击工作区取消选中
+                this.workspace.addEventListener('click', (e) => {
+                    if (e.target === this.workspace || e.target === this.canvas) {
+                        this.deselectElement();
+                    }
+                });
+                
+                // 键盘事件
+                document.addEventListener('keydown', (e) => {
+                    if (e.key === 'Delete' || e.key === 'Backspace') {
+                        if (this.selectedElement) {
+                            this.removeElement(this.selectedElement);
+                        }
+                    }
+                });
+            }
+            
+            setupComponentDrag() {
+                // 组件工具箱拖动
+                document.querySelectorAll('.component-item').forEach(item => {
+                    item.addEventListener('dragstart', (e) => {
+                        const type = item.dataset.type;
+                        const voltage = item.dataset.voltage || 0;
+                        const resistance = item.dataset.resistance || 0;
+                        
+                        e.dataTransfer.setData('text/plain', JSON.stringify({
+                            type, voltage, resistance
+                        }));
+                        
+                        // 创建拖动图像
+                        const dragIcon = document.createElement('div');
+                        dragIcon.innerHTML = `<i class="${item.querySelector('.component-icon i').className}"></i>`;
+                        dragIcon.style.fontSize = '2rem';
+                        dragIcon.style.color = '#3498db';
+                        document.body.appendChild(dragIcon);
+                        e.dataTransfer.setDragImage(dragIcon, 10, 10);
+                        
+                        setTimeout(() => {
+                            document.body.removeChild(dragIcon);
+                        }, 0);
+                    });
+                });
+                
+                // 工作区放置
+                this.workspace.addEventListener('dragover', (e) => {
+                    e.preventDefault();
+                    e.dataTransfer.dropEffect = 'copy';
+                });
+                
+                this.workspace.addEventListener('drop', (e) => {
+                    e.preventDefault();
+                    const data = JSON.parse(e.dataTransfer.getData('text/plain'));
+                    
+                    const rect = this.workspace.getBoundingClientRect();
+                    const x = e.clientX - rect.left - 60;
+                    const y = e.clientY - rect.top - 50;
+                    
+                    this.addElement(data.type, x, y, {
+                        voltage: parseInt(data.voltage),
+                        resistance: parseInt(data.resistance)
+                    });
+                });
+            }
+            
+            setupFaultControls() {
+                document.querySelectorAll('.fault-item').forEach(item => {
+                    item.addEventListener('click', () => {
+                        // 移除所有激活状态
+                        document.querySelectorAll('.fault-item').forEach(f => {
+                            f.classList.remove('active');
+                        });
+                        
+                        // 设置当前激活
+                        item.classList.add('active');
+                        this.faultType = item.dataset.fault;
+                        
+                        // 更新电路模拟
+                        this.updateCircuit();
+                    });
+                });
+            }
+            
+            setupSliders() {
+                // 电压滑块
+                const voltageSlider = document.getElementById('voltage-slider');
+                const voltageValue = document.getElementById('voltage-value');
+                
+                voltageSlider.addEventListener('input', () => {
+                    const voltage = parseInt(voltageSlider.value);
+                    voltageValue.textContent = `${voltage}V`;
+                    
+                    // 更新所有电源元件
+                    this.elements.forEach(element => {
+                        if (element.type === 'battery') {
+                            element.voltage = voltage;
+                            if (element.valueElement) {
+                                element.valueElement.textContent = `${voltage}V`;
+                            }
+                        }
+                    });
+                    
+                    this.updateCircuit();
+                });
+                
+                // 电阻滑块
+                const resistanceSlider = document.getElementById('resistance-slider');
+                const resistanceValue = document.getElementById('resistance-value');
+                
+                resistanceSlider.addEventListener('input', () => {
+                    const resistance = parseInt(resistanceSlider.value);
+                    resistanceValue.textContent = `${resistance}Ω`;
+                    
+                    // 更新所有滑动变阻器
+                    this.elements.forEach(element => {
+                        if (element.type === 'resistor') {
+                            element.resistance = resistance;
+                            if (element.valueElement) {
+                                element.valueElement.textContent = `${resistance}Ω`;
+                            }
+                        }
+                    });
+                    
+                    this.updateCircuit();
+                });
+            }
+            
+            setupButtons() {
+                // 清空电路按钮
+                document.getElementById('clear-circuit').addEventListener('click', () => {
+                    this.clearCircuit();
+                });
+                
+                // 清除连接按钮
+                document.getElementById('clear-connections').addEventListener('click', () => {
+                    this.clearConnections();
+                });
+            }
+            
+            addDefaultCircuit() {
+                // 添加一个示例电路
+                setTimeout(() => {
+                    this.addElement('battery', 100, 200, { voltage: 9 });
+                    this.addElement('switch', 250, 200, {});
+                    this.addElement('bulb', 400, 200, { resistance: 10 });
+                    this.addElement('resistor', 400, 350, { resistance: 50 });
+                    this.addElement('voltmeter', 550, 200, {});
+                    this.addElement('ammeter', 250, 350, {});
+                    
+                    // 自动连接示例电路
+                    setTimeout(() => {
+                        // 找到元件
+                        const battery = this.elements.find(e => e.type === 'battery');
+                        const switchEl = this.elements.find(e => e.type === 'switch');
+                        const bulb = this.elements.find(e => e.type === 'bulb');
+                        const resistor = this.elements.find(e => e.type === 'resistor');
+                        const voltmeter = this.elements.find(e => e.type === 'voltmeter');
+                        const ammeter = this.elements.find(e => e.type === 'ammeter');
+                        
+                        if (battery && switchEl && bulb && resistor && voltmeter && ammeter) {
+                            // 连接电路
+                            this.connectElements(battery.connectors[1], switchEl.connectors[0]);
+                            this.connectElements(switchEl.connectors[1], bulb.connectors[0]);
+                            this.connectElements(bulb.connectors[1], resistor.connectors[0]);
+                            this.connectElements(resistor.connectors[1], ammeter.connectors[0]);
+                            this.connectElements(ammeter.connectors[1], battery.connectors[0]);
+                            
+                            // 连接电压表（并联在灯泡两端）
+                            this.connectElements(voltmeter.connectors[0], bulb.connectors[0]);
+                            this.connectElements(voltmeter.connectors[1], bulb.connectors[1]);
+                            
+                            // 更新电路
+                            this.updateCircuit();
+                        }
+                    }, 500);
+                }, 1000);
+            }
+            
+            addElement(type, x, y, properties = {}) {
+                const element = {
+                    id: `element-${Date.now()}-${Math.random()}`,
+                    type: type,
+                    x: x,
+                    y: y,
+                    width: 120,
+                    height: 100,
+                    isClosed: type === 'switch' ? false : true, // 开关默认打开
+                    isSelected: false,
+                    voltage: properties.voltage || 0,
+                    resistance: properties.resistance || 0,
+                    current: 0,
+                    connectors: [],
+                    element: null,
+                    iconElement: null,
+                    valueElement: null
+                };
+                
+                // 创建DOM元素
+                const elementDiv = document.createElement('div');
+                elementDiv.className = 'circuit-element';
+                elementDiv.id = element.id;
+                elementDiv.style.left = `${x}px`;
+                elementDiv.style.top = `${y}px`;
+                
+                // 确定元件图标和名称
+                let iconClass, elementName, valueText;
+                switch(type) {
+                    case 'battery':
+                        iconClass = 'fas fa-battery-full';
+                        elementName = '电源';
+                        valueText = `${element.voltage}V`;
+                        break;
+                    case 'switch':
+                        iconClass = 'fas fa-toggle-off';
+                        elementName = '开关';
+                        valueText = element.isClosed ? '闭合' : '断开';
+                        break;
+                    case 'bulb':
+                        iconClass = 'fas fa-lightbulb';
+                        elementName = '灯泡';
+                        valueText = `${element.resistance}Ω`;
+                        break;
+                    case 'resistor':
+                        iconClass = 'fas fa-resistance';
+                        elementName = '变阻器';
+                        valueText = `${element.resistance}Ω`;
+                        break;
+                    case 'motor':
+                        iconClass = 'fas fa-cog';
+                        elementName = '电动机';
+                        valueText = `${element.resistance}Ω`;
+                        break;
+                    case 'voltmeter':
+                        iconClass = 'fas fa-bolt';
+                        elementName = '电压表';
+                        valueText = '0V';
+                        break;
+                    case 'ammeter':
+                        iconClass = 'fas fa-tachometer-alt';
+                        elementName = '电流表';
+                        valueText = '0A';
+                        break;
+                }
+                
+                elementDiv.innerHTML = `
+                    <div class="element-content">
+                        <div class="element-icon"><i class="${iconClass}"></i></div>
+                        <div class="element-name">${elementName}</div>
+                        <div class="element-value">${valueText}</div>
+                    </div>
+                `;
+                
+                this.workspaceComponents.appendChild(elementDiv);
+                
+                // 保存DOM元素引用
+                element.element = elementDiv;
+                element.iconElement = elementDiv.querySelector('.element-icon i');
+                element.valueElement = elementDiv.querySelector('.element-value');
+                
+                // 添加连接点
+                this.addConnectors(element);
+                
+                // 添加事件监听
+                this.setupElementEvents(element);
+                
+                // 添加到元素列表
+                this.elements.push(element);
+                
+                return element;
+            }
+            
+            addConnectors(element) {
+                // 根据元件类型添加连接点
+                let connectorPositions = [];
+                
+                switch(element.type) {
+                    case 'battery':
+                        connectorPositions = [
+                            { x: 10, y: 50, id: 'negative' },
+                            { x: 110, y: 50, id: 'positive' }
+                        ];
+                        break;
+                    case 'switch':
+                        connectorPositions = [
+                            { x: 10, y: 50, id: 'in' },
+                            { x: 110, y: 50, id: 'out' }
+                        ];
+                        break;
+                    case 'bulb':
+                    case 'motor':
+                    case 'resistor':
+                        connectorPositions = [
+                            { x: 10, y: 50, id: 'terminal1' },
+                            { x: 110, y: 50, id: 'terminal2' }
+                        ];
+                        break;
+                    case 'voltmeter':
+                    case 'ammeter':
+                        connectorPositions = [
+                            { x: 30, y: 10, id: 'positive' },
+                            { x: 90, y: 10, id: 'negative' }
+                        ];
+                        break;
+                }
+                
+                // 创建连接点DOM元素
+                connectorPositions.forEach(pos => {
+                    const connector = document.createElement('div');
+                    connector.className = 'connection-point';
+                    connector.dataset.elementId = element.id;
+                    connector.dataset.connectorId = pos.id;
+                    
+                    connector.style.left = `${pos.x}px`;
+                    connector.style.top = `${pos.y}px`;
+                    
+                    // 添加到元件内部
+                    element.element.appendChild(connector);
+                    
+                    // 保存连接点信息
+                    const connectorObj = {
+                        element: element,
+                        id: pos.id,
+                        x: pos.x,
+                        y: pos.y,
+                        domElement: connector,
+                        connections: []
+                    };
+                    
+                    element.connectors.push(connectorObj);
+                    
+                    // 添加连接点事件
+                    connector.addEventListener('mousedown', (e) => {
+                        e.stopPropagation();
+                        this.startConnection(connectorObj);
+                    });
+                    
+                    connector.addEventListener('touchstart', (e) => {
+                        e.stopPropagation();
+                        this.startConnection(connectorObj);
+                    });
+                });
+            }
+            
+            setupElementEvents(element) {
+                // 点击选择元件
+                element.element.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    this.selectElement(element);
+                });
+                
+                // 双击切换开关状态
+                element.element.addEventListener('dblclick', (e) => {
+                    e.stopPropagation();
+                    if (element.type === 'switch') {
+                        this.toggleSwitch(element);
+                    }
+                });
+                
+                // 拖动元件
+                this.makeDraggable(element);
+            }
+            
+            makeDraggable(element) {
+                let isDragging = false;
+                let offsetX, offsetY;
+                
+                const startDrag = (e) => {
+                    e.stopPropagation();
+                    isDragging = true;
+                    
+                    const rect = element.element.getBoundingClientRect();
+                    const clientX = e.type.includes('touch') ? e.touches[0].clientX : e.clientX;
+                    const clientY = e.type.includes('touch') ? e.touches[0].clientY : e.clientY;
+                    
+                    offsetX = clientX - rect.left;
+                    offsetY = clientY - rect.top;
+                    
+                    this.selectElement(element);
+                    
+                    document.addEventListener('mousemove', drag);
+                    document.addEventListener('touchmove', drag);
+                    document.addEventListener('mouseup', stopDrag);
+                    document.addEventListener('touchend', stopDrag);
+                };
+                
+                const drag = (e) => {
+                    if (!isDragging) return;
+                    
+                    e.preventDefault();
+                    const clientX = e.type.includes('touch') ? e.touches[0].clientX : e.clientX;
+                    const clientY = e.type.includes('touch') ? e.touches[0].clientY : e.clientY;
+                    
+                    const rect = this.workspace.getBoundingClientRect();
+                    let x = clientX - rect.left - offsetX;
+                    let y = clientY - rect.top - offsetY;
+                    
+                    // 限制在工作区内
+                    x = Math.max(0, Math.min(x, rect.width - element.width));
+                    y = Math.max(0, Math.min(y, rect.height - element.height));
+                    
+                    element.x = x;
+                    element.y = y;
+                    element.element.style.left = `${x}px`;
+                    element.element.style.top = `${y}px`;
+                    
+                    // 更新连接线
+                    this.drawConnections();
+                };
+                
+                const stopDrag = () => {
+                    isDragging = false;
+                    document.removeEventListener('mousemove', drag);
+                    document.removeEventListener('touchmove', drag);
+                    document.removeEventListener('mouseup', stopDrag);
+                    document.removeEventListener('touchend', stopDrag);
+                };
+                
+                element.element.addEventListener('mousedown', startDrag);
+                element.element.addEventListener('touchstart', startDrag, { passive: false });
+            }
+            
+            startConnection(connector) {
+                if (this.connectionInProgress && this.connectionStartPoint) {
+                    // 完成连接
+                    this.connectElements(this.connectionStartPoint, connector);
+                    this.connectionInProgress = false;
+                    this.connectionStartPoint = null;
+                    
+                    // 移除所有连接点的临时高亮
+                    document.querySelectorAll('.connection-point').forEach(cp => {
+                        cp.classList.remove('connecting');
+                    });
+                } else {
+                    // 开始新连接
+                    this.connectionInProgress = true;
+                    this.connectionStartPoint = connector;
+                    
+                    // 高亮当前连接点
+                    connector.domElement.classList.add('connecting');
+                }
+            }
+            
+            connectElements(connector1, connector2) {
+                // 检查是否已连接
+                const existingConnection = this.connections.find(conn => 
+                    (conn.connector1 === connector1 && conn.connector2 === connector2) ||
+                    (conn.connector1 === connector2 && conn.connector2 === connector1)
+                );
+                
+                if (existingConnection) return;
+                
+                // 创建新连接
+                const connection = {
+                    connector1: connector1,
+                    connector2: connector2,
+                    id: `connection-${Date.now()}`
+                };
+                
+                this.connections.push(connection);
+                
+                // 更新连接点状态
+                connector1.domElement.classList.add('connected');
+                connector2.domElement.classList.add('connected');
+                
+                // 更新电路
+                this.updateCircuit();
+                this.drawConnections();
+            }
+            
+            drawConnections() {
+                // 清除画布
+                this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
+                
+                // 绘制所有连接线
+                this.connections.forEach(connection => {
+                    const conn1 = connection.connector1;
+                    const conn2 = connection.connector2;
+                    
+                    // 计算连接点的实际位置
+                    const x1 = conn1.element.x + conn1.x;
+                    const y1 = conn1.element.y + conn1.y;
+                    const x2 = conn2.element.x + conn2.x;
+                    const y2 = conn2.element.y + conn2.y;
+                    
+                    // 设置线条样式
+                    this.ctx.strokeStyle = '#2ecc71';
+                    this.ctx.lineWidth = 3;
+                    this.ctx.lineCap = 'round';
+                    
+                    // 绘制线条
+                    this.ctx.beginPath();
+                    this.ctx.moveTo(x1, y1);
+                    this.ctx.lineTo(x2, y2);
+                    this.ctx.stroke();
+                });
+            }
+            
+            toggleSwitch(switchElement) {
+                switchElement.isClosed = !switchElement.isClosed;
+                
+                // 更新图标
+                if (switchElement.isClosed) {
+                    switchElement.iconElement.className = 'fas fa-toggle-on';
+                    switchElement.valueElement.textContent = '闭合';
+                } else {
+                    switchElement.iconElement.className = 'fas fa-toggle-off';
+                    switchElement.valueElement.textContent = '断开';
+                }
+                
+                // 更新电路
+                this.updateCircuit();
+            }
+            
+            selectElement(element) {
+                // 取消之前选中的元件
+                this.deselectElement();
+                
+                // 选中当前元件
+                element.isSelected = true;
+                element.element.classList.add('element-selected');
+                this.selectedElement = element;
+            }
+            
+            deselectElement() {
+                if (this.selectedElement) {
+                    this.selectedElement.isSelected = false;
+                    this.selectedElement.element.classList.remove('element-selected');
+                    this.selectedElement = null;
+                }
+            }
+            
+            removeElement(element) {
+                // 移除所有相关连接
+                this.connections = this.connections.filter(connection => {
+                    const conn1 = connection.connector1;
+                    const conn2 = connection.connector2;
+                    
+                    if (conn1.element === element || conn2.element === element) {
+                        // 移除连接点的高亮状态
+                        if (conn1.element !== element) {
+                            this.updateConnectorState(conn1);
+                        }
+                        if (conn2.element !== element) {
+                            this.updateConnectorState(conn2);
+                        }
+                        return false;
+                    }
+                    return true;
+                });
+                
+                // 从DOM中移除
+                if (element.element && element.element.parentNode) {
+                    element.element.parentNode.removeChild(element.element);
+                }
+                
+                // 从元素列表中移除
+                this.elements = this.elements.filter(el => el !== element);
+                
+                // 更新电路
+                this.updateCircuit();
+                this.drawConnections();
+            }
+            
+            updateConnectorState(connector) {
+                // 检查连接点是否还有连接
+                const hasConnection = this.connections.some(connection => 
+                    connection.connector1 === connector || connection.connector2 === connector
+                );
+                
+                if (hasConnection) {
+                    connector.domElement.classList.add('connected');
+                } else {
+                    connector.domElement.classList.remove('connected');
+                }
+            }
+            
+            clearCircuit() {
+                // 移除所有元件
+                this.elements.forEach(element => {
+                    if (element.element && element.element.parentNode) {
+                        element.element.parentNode.removeChild(element.element);
+                    }
+                });
+                
+                // 清空数组
+                this.elements = [];
+                this.connections = [];
+                
+                // 清除画布
+                this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
+                
+                // 重置电路信息
+                this.updateCircuitInfo(0, 0, 0, 0, false);
+            }
+            
+            clearConnections() {
+                // 移除所有连接
+                this.connections = [];
+                
+                // 清除连接点状态
+                this.elements.forEach(element => {
+                    element.connectors.forEach(connector => {
+                        connector.domElement.classList.remove('connected');
+                    });
+                });
+                
+                // 清除画布
+                this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
+                
+                // 更新电路
+                this.updateCircuit();
+            }
+            
+            updateCircuit() {
+                // 计算电路参数
+                const circuitInfo = this.calculateCircuit();
+                
+                // 更新元件状态
+                this.updateElementsState(circuitInfo);
+                
+                // 更新电路信息显示
+                this.updateCircuitInfo(
+                    circuitInfo.totalVoltage,
+                    circuitInfo.totalResistance,
+                    circuitInfo.totalCurrent,
+                    circuitInfo.totalPower,
+                    circuitInfo.isClosed
+                );
+                
+                // 更新连接线
+                this.drawConnections();
+            }
+            
+            calculateCircuit() {
+                // 简化电路计算（假设所有元件串联）
+                let totalVoltage = 0;
+                let totalResistance = 0;
+                let isCircuitClosed = false;
+                
+                // 查找电源
+                const batteries = this.elements.filter(el => el.type === 'battery');
+                if (batteries.length > 0) {
+                    totalVoltage = batteries.reduce((sum, battery) => sum + battery.voltage, 0);
+                }
+                
+                // 检查是否有闭合路径
+                const hasClosedPath = this.checkClosedPath();
+                
+                // 如果电路闭合，计算总电阻
+                if (hasClosedPath) {
+                    isCircuitClosed = true;
+                    
+                    // 计算串联电阻
+                    this.elements.forEach(element => {
+                        if (this.isResistiveElement(element) && element.isClosed) {
+                            // 根据故障类型调整电阻
+                            let resistance = element.resistance;
+                            
+                            if (this.faultType === 'short-circuit' && element.type === 'bulb') {
+                                resistance = 0.1; // 灯泡短路，电阻极小
+                            } else if (this.faultType === 'bulb-burned' && element.type === 'bulb') {
+                                resistance = 10000; // 灯泡烧坏，电阻极大
+                            } else if (element.type === 'switch' && !element.isClosed) {
+                                resistance = 10000; // 开关断开，电阻极大
+                            }
+                            
+                            totalResistance += resistance;
+                        }
+                    });
+                    
+                    // 避免除零错误
+                    if (totalResistance === 0) totalResistance = 0.1;
+                }
+                
+                // 计算电流和功率
+                const totalCurrent = isCircuitClosed ? totalVoltage / totalResistance : 0;
+                const totalPower = isCircuitClosed ? totalCurrent * totalVoltage : 0;
+                
+                return {
+                    totalVoltage,
+                    totalResistance,
+                    totalCurrent,
+                    totalPower,
+                    isClosed: isCircuitClosed
+                };
+            }
+            
+            isResistiveElement(element) {
+                return ['bulb', 'motor', 'resistor', 'switch'].includes(element.type);
+            }
+            
+            checkClosedPath() {
+                // 简化版：检查是否有电源且至少有一条完整路径
+                const hasBattery = this.elements.some(el => el.type === 'battery');
+                const hasConnections = this.connections.length > 0;
+                
+                // 检查是否有开关且开关是否闭合
+                const switches = this.elements.filter(el => el.type === 'switch');
+                const allSwitchesClosed = switches.length === 0 || switches.every(s => s.isClosed);
+                
+                return hasBattery && hasConnections && allSwitchesClosed;
+            }
+            
+            updateElementsState(circuitInfo) {
+                const { totalCurrent, totalVoltage, isClosed } = circuitInfo;
+                
+                this.elements.forEach(element => {
+                    // 重置元件状态
+                    if (element.iconElement) {
+                        element.iconElement.classList.remove('bulb-on', 'motor-on');
+                    }
+                    
+                    // 更新元件值显示
+                    if (element.valueElement) {
+                        switch(element.type) {
+                            case 'voltmeter':
+                                // 电压表显示电压（并联在元件两端）
+                                element.valueElement.textContent = isClosed ? `${totalVoltage.toFixed(2)}V` : '0V';
+                                break;
+                            case 'ammeter':
+                                // 电流表显示电流
+                                element.valueElement.textContent = isClosed ? `${totalCurrent.toFixed(3)}A` : '0A';
+                                break;
+                            case 'bulb':
+                                // 灯泡亮起条件：电路闭合且电流大于0
+                                if (isClosed && totalCurrent > 0) {
+                                    element.iconElement.classList.add('bulb-on');
+                                }
+                                break;
+                            case 'motor':
+                                // 电动机转动条件：电路闭合且电流大于0
+                                if (isClosed && totalCurrent > 0) {
+                                    element.iconElement.classList.add('motor-on');
+                                }
+                                break;
+                        }
+                    }
+                    
+                    // 记录元件电流（用于更复杂的模拟）
+                    element.current = totalCurrent;
+                });
+            }
+            
+            updateCircuitInfo(voltage, resistance, current, power, isClosed) {
+                // 更新电路信息显示
+                document.getElementById('total-voltage').textContent = `${voltage.toFixed(2)} V`;
+                document.getElementById('total-resistance').textContent = `${resistance.toFixed(2)} Ω`;
+                document.getElementById('total-current').textContent = `${current.toFixed(3)} A`;
+                document.getElementById('total-power').textContent = `${power.toFixed(3)} W`;
+                
+                // 更新电路状态
+                const circuitState = document.getElementById('circuit-state');
+                const circuitStatus = document.getElementById('circuit-status');
+                
+                if (isClosed) {
+                    circuitState.textContent = '闭合';
+                    circuitState.style.color = '#2ecc71';
+                    
+                    circuitStatus.className = 'circuit-status circuit-closed';
+                    circuitStatus.innerHTML = '<i class="fas fa-check-circle"></i> 电路已接通';
+                } else {
+                    circuitState.textContent = '开路';
+                    circuitState.style.color = '#e74c3c';
+                    
+                    circuitStatus.className = 'circuit-status circuit-open';
+                    circuitStatus.innerHTML = '<i class="fas fa-times-circle"></i> 电路未接通';
+                }
+                
+                // 应用故障状态
+                if (this.faultType !== 'none') {
+                    circuitStatus.innerHTML += ` (故障: ${this.getFaultName(this.faultType)})`;
+                }
+            }
+            
+            getFaultName(faultType) {
+                switch(faultType) {
+                    case 'open-circuit': return '断路';
+                    case 'short-circuit': return '短路';
+                    case 'bulb-burned': return '灯泡烧坏';
+                    default: return '无';
+                }
+            }
+            
+            simulate() {
+                // 持续更新电路状态
+                this.updateCircuit();
+                
+                // 继续模拟循环
+                requestAnimationFrame(() => this.simulate());
+            }
+        }
+        
+        // 初始化电路模拟器
+        window.addEventListener('DOMContentLoaded', () => {
+            new CircuitSimulator();
+        });
+    </script>
+</body>
+</html>
