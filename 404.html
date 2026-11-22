@@ -3,105 +3,291 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>重力 G – 质量 m 关系曲线生成器</title>
+<title>小徐 · 物理实验室</title>
 <style>
   :root{
-    --bg:#f4f6fb;
-    --card:#ffffff;
-    --text:#1f2937;
-    --muted:#6b7280;
-    --line:#e5e7eb;
-    --accent:#2563eb;
-    --accent-dark:#1d4ed8;
-    --accent-soft:#eff6ff;
-    --danger:#dc2626;
-    --shadow:0 6px 24px rgba(15,23,42,.07);
+    --bg:#0a0f18;
+    --surface:#0f1724;
+    --surface-2:#121c2c;
+    --line:#1d2b3f;
+    --text:#f1f5f9;
+    --muted:#8b9bb4;
+    --dim:#5d6b82;
+    --cyan:#2dd4e8;
+    --cyan-deep:#0891b2;
+    --green:#22e07a;
+    --danger:#f87171;
+    --ok:#34d399;
+    --shadow:0 12px 36px rgba(0,0,0,.28);
   }
   *{box-sizing:border-box}
+  html{scroll-behavior:smooth}
   body{
-    margin:0;
-    background:var(--bg);
-    color:var(--text);
+    margin:0;background:var(--bg);color:var(--text);
     font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","PingFang SC","Microsoft YaHei",sans-serif;
-    font-size:14px;
-    line-height:1.5;
+    font-size:14px;line-height:1.5;
   }
-  .app{max-width:1240px;margin:0 auto;padding:28px 20px 40px}
-  header{margin-bottom:20px}
-  header h1{margin:0 0 6px;font-size:24px;letter-spacing:.3px}
-  header p{margin:0;color:var(--muted)}
-  .layout{display:grid;grid-template-columns:370px 1fr;gap:20px;align-items:start}
-  .panel{background:var(--card);border:1px solid var(--line);border-radius:14px;box-shadow:var(--shadow)}
-  .controls{padding:18px}
-  .tabs{display:flex;gap:6px;background:#f3f4f6;padding:4px;border-radius:9px;margin-bottom:14px}
-  .tab{flex:1;border:0;background:transparent;padding:7px 4px;border-radius:6px;color:var(--muted);cursor:pointer;font-size:13px;font-weight:600}
-  .tab.active{background:#fff;color:var(--accent);box-shadow:0 1px 4px rgba(15,23,42,.1)}
-  .table-head,.row{display:grid;grid-template-columns:1fr 1fr 30px;gap:8px;align-items:center}
-  .table-head{font-size:12px;color:var(--muted);padding:0 2px 6px}
+  button{font-family:inherit}
+  [hidden]{display:none!important}
+
+  /* ===== 首页 ===== */
+  .home{max-width:480px;margin:0 auto;min-height:100vh;padding:20px 18px 32px}
+  .brand{display:flex;align-items:center;gap:9px;font-size:15px;font-weight:650;letter-spacing:.3px;margin-bottom:22px}
+  .brand svg{flex:none}
+
+  .hero{
+    position:relative;border:1px solid var(--green);border-radius:4px;
+    height:296px;overflow:hidden;background:linear-gradient(160deg,#0d1725 0%,#0b1220 70%);
+  }
+  .hero svg.wave{position:absolute;inset:0;width:100%;height:100%;display:block}
+  .hero-content{position:relative;z-index:1;padding:22px 20px;height:100%;display:flex;flex-direction:column;align-items:flex-start}
+  .tag{
+    display:inline-flex;align-items:center;gap:6px;padding:5px 11px;border-radius:999px;
+    background:rgba(45,212,232,.10);border:1px solid rgba(45,212,232,.32);
+    color:#a9f0f8;font-size:11px;font-weight:600;letter-spacing:.3px;
+  }
+  .tag .diamond{width:6px;height:6px;background:var(--cyan);transform:rotate(45deg);border-radius:1px}
+  .hero h1{
+    margin:20px 0 0;font-size:32px;line-height:1.28;font-weight:800;letter-spacing:.5px;
+    text-shadow:0 2px 18px rgba(0,0,0,.55);
+  }
+  .cta{
+    margin-top:auto;border:0;cursor:pointer;border-radius:999px;
+    background:linear-gradient(90deg,#22d3ee,#2dd4bf);color:#04212b;
+    font-size:14px;font-weight:700;padding:11px 20px;display:inline-flex;align-items:center;gap:8px;
+    box-shadow:0 6px 22px rgba(45,212,232,.28);transition:transform .12s,box-shadow .12s;
+  }
+  .cta:hover{transform:translateY(-2px);box-shadow:0 10px 26px rgba(45,212,232,.4)}
+  .cta:active{transform:translateY(0)}
+  .hero .hero-dot-label{
+    position:absolute;right:16px;top:112px;font-size:10px;color:rgba(255,255,255,.72);
+    background:rgba(6,18,28,.6);padding:2px 7px;border-radius:999px;letter-spacing:.2px;
+  }
+
+  .section{margin-top:28px}
+  .section h2{font-size:16px;font-weight:700;margin:0 0 12px;letter-spacing:.3px}
+  .subject-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:11px}
+  .subject{
+    background:var(--surface);border:1px solid var(--line);border-radius:12px;
+    padding:14px;min-height:114px;cursor:pointer;transition:border-color .15s,transform .12s,background .15s;
+    text-align:left;color:inherit;display:flex;flex-direction:column;align-items:flex-start;
+  }
+  .subject:hover{border-color:rgba(45,212,232,.45);background:var(--surface-2);transform:translateY(-2px)}
+  .subject .ico{
+    width:34px;height:34px;border-radius:9px;background:rgba(45,212,232,.10);
+    border:1px solid rgba(45,212,232,.18);display:grid;place-items:center;margin-bottom:auto;
+  }
+  .subject b{font-size:14px;font-weight:650;margin-top:12px}
+  .subject span{font-size:11px;color:var(--muted);margin-top:2px}
+
+  .exp-card{
+    display:flex;align-items:center;gap:13px;width:100%;text-align:left;cursor:pointer;
+    background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:12px;
+    transition:border-color .15s,transform .12s,background .15s;color:inherit;
+  }
+  .exp-card:hover{border-color:rgba(45,212,232,.45);transform:translateY(-2px);background:var(--surface-2)}
+  .exp-thumb{
+    flex:none;width:92px;height:76px;border-radius:8px;overflow:hidden;
+    background:#0b2a33;border:1px solid #174b56;
+  }
+  .exp-thumb svg{display:block;width:100%;height:100%}
+  .exp-info{min-width:0}
+  .exp-badge{
+    display:inline-block;font-size:10px;color:#7debf5;background:rgba(45,212,232,.10);
+    border:1px solid rgba(45,212,232,.22);border-radius:999px;padding:2px 8px;margin-bottom:6px;
+  }
+  .exp-info b{display:block;font-size:14px;font-weight:650}
+  .exp-info small{display:block;color:var(--muted);font-size:11px;margin-top:3px}
+  .foot{color:var(--dim);font-size:10.5px;text-align:center;margin-top:34px;letter-spacing:.2px}
+  @keyframes rise{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:none}}
+  .reveal{animation:rise .35s ease both}
+
+  /* ===== 实验页 ===== */
+  .lab{max-width:480px;margin:0 auto;padding:16px 16px 36px;min-height:100vh}
+  .lab-top{display:flex;align-items:center;gap:12px;margin-bottom:18px}
+  .back{
+    border:1px solid var(--line);background:var(--surface);color:var(--muted);cursor:pointer;
+    width:34px;height:34px;border-radius:9px;display:grid;place-items:center;font-size:18px;line-height:1;
+  }
+  .back:hover{color:var(--cyan);border-color:rgba(45,212,232,.4)}
+  .home-link{margin-left:auto;border:0;background:transparent;color:var(--muted);font-size:12px;cursor:pointer;padding:6px 2px}
+  .home-link:hover{color:var(--cyan)}
+  .lab-top h1{flex:1;font-size:16px;margin:0;font-weight:700}
+  .page-title{font-size:22px;font-weight:800;margin:6px 0 20px;letter-spacing:.3px}
+  .lab-top small{display:block;color:var(--muted);font-size:11px;font-weight:400;margin-top:1px}
+  .lab-intro{
+    background:linear-gradient(120deg,rgba(45,212,232,.09),rgba(45,212,232,.02));
+    border:1px solid rgba(45,212,232,.18);border-radius:11px;padding:12px 14px;margin-bottom:16px;
+    font-size:12px;color:#b6c6d9;
+  }
+  .lab-intro b{color:var(--cyan)}
+
+  .panel{background:var(--surface);border:1px solid var(--line);border-radius:12px;box-shadow:var(--shadow)}
+  .controls{padding:16px}
+  .tabs{display:flex;gap:5px;background:#0b1320;padding:4px;border-radius:9px;margin-bottom:14px}
+  .tab{flex:1;border:0;background:transparent;padding:7px 4px;border-radius:6px;color:var(--muted);cursor:pointer;font-size:12.5px;font-weight:600}
+  .tab.active{background:var(--surface-2);color:var(--cyan);box-shadow:0 1px 4px rgba(0,0,0,.3)}
+  .table-head,.row{display:grid;grid-template-columns:1fr 1fr 28px;gap:7px;align-items:center}
+  .table-head{font-size:11px;color:var(--muted);padding:0 2px 6px}
   .table-head span:last-child{text-align:center}
-  #rows{max-height:250px;overflow-y:auto;padding-right:2px}
+  #rows{max-height:238px;overflow-y:auto;padding-right:2px}
   .row{margin-bottom:7px}
   input,textarea{
-    width:100%;padding:8px 10px;border:1px solid #d1d5db;border-radius:7px;
-    font:inherit;color:var(--text);background:#fff;outline:none;transition:border-color .15s,box-shadow .15s;
+    width:100%;padding:8px 10px;border:1px solid #26374d;border-radius:7px;
+    font:inherit;font-size:13px;color:var(--text);background:#0b1320;outline:none;transition:border-color .15s,box-shadow .15s;
   }
-  input:focus,textarea:focus{border-color:var(--accent);box-shadow:0 0 0 3px rgba(37,99,235,.12)}
-  input::placeholder{color:#b9c0ca;font-style:italic;opacity:1}
-  input.bad{border-color:var(--danger);box-shadow:0 0 0 3px rgba(220,38,38,.1)}
-  .del{border:0;background:transparent;color:#9ca3af;cursor:pointer;font-size:18px;line-height:1;border-radius:5px;height:30px}
-  .del:hover{background:#fee2e2;color:var(--danger)}
-  .link-btn{border:0;background:transparent;color:var(--accent);cursor:pointer;font-size:13px;padding:4px 0;font-weight:600}
-  .link-btn:hover{color:var(--accent-dark)}
-  textarea{resize:vertical;min-height:170px;line-height:1.6;font-family:ui-monospace,Consolas,monospace;font-size:13px}
-  .hint{font-size:12px;color:var(--muted);margin:6px 0 0}
-  .options{display:flex;flex-wrap:wrap;gap:12px;margin:16px 0;padding-top:14px;border-top:1px dashed var(--line)}
-  .options label{display:flex;align-items:center;gap:5px;color:var(--muted);cursor:pointer;font-size:13px}
-  .options input[type=checkbox]{width:auto;accent-color:var(--accent)}
+  input:focus,textarea:focus{border-color:var(--cyan);box-shadow:0 0 0 3px rgba(45,212,232,.12)}
+  input::placeholder{color:#4b5b71;font-style:italic;opacity:1}
+  input.bad{border-color:var(--danger);box-shadow:0 0 0 3px rgba(248,113,113,.12)}
+  .del{border:0;background:transparent;color:#5d6b82;cursor:pointer;font-size:18px;line-height:1;border-radius:5px;height:30px}
+  .del:hover{background:rgba(248,113,113,.12);color:var(--danger)}
+  .link-btn{border:0;background:transparent;color:var(--cyan);cursor:pointer;font-size:12.5px;padding:4px 0;font-weight:600}
+  .link-btn:hover{color:#67e8f9}
+  textarea{resize:vertical;min-height:160px;line-height:1.6;font-family:ui-monospace,Consolas,monospace;font-size:12px}
+  .hint{font-size:11px;color:var(--muted);margin:6px 0 0}
+  .options{display:flex;flex-wrap:wrap;gap:12px;margin:14px 0;padding-top:12px;border-top:1px dashed var(--line)}
+  .options label{display:flex;align-items:center;gap:5px;color:var(--muted);cursor:pointer;font-size:12px}
+  .options input[type=checkbox]{width:auto;accent-color:var(--cyan)}
   .actions{display:flex;gap:8px;flex-wrap:wrap}
   button.primary{
-    flex:1;min-width:130px;border:0;border-radius:8px;background:var(--accent);color:#fff;
-    padding:11px 14px;font-size:14px;font-weight:600;cursor:pointer;transition:background .15s,transform .1s;
+    flex:1;min-width:120px;border:0;border-radius:8px;color:#05232c;
+    background:linear-gradient(90deg,#22d3ee,#2dd4bf);
+    padding:11px 14px;font-size:13.5px;font-weight:700;cursor:pointer;transition:transform .1s,filter .15s;
   }
-  button.primary:hover{background:var(--accent-dark)}
+  button.primary:hover{filter:brightness(1.08)}
   button.primary:active{transform:translateY(1px)}
   button.secondary{
-    border:1px solid #d1d5db;border-radius:8px;background:#fff;color:var(--text);
-    padding:10px 12px;font-size:13px;cursor:pointer;
+    border:1px solid #2b3a50;border-radius:8px;background:#111c2b;color:#c3d0e0;
+    padding:10px 12px;font-size:12.5px;cursor:pointer;
   }
-  button.secondary:hover{background:#f9fafb;border-color:#9ca3af}
-  #message{min-height:20px;margin:10px 0 0;font-size:12.5px;color:var(--muted)}
+  button.secondary:hover{border-color:var(--cyan);color:var(--cyan)}
+  #message{min-height:18px;margin:10px 0 0;font-size:11.5px;color:var(--muted)}
   #message.error{color:var(--danger)}
-  #message.ok{color:#059669}
-  .chart-panel{padding:18px 18px 14px;min-width:0}
-  .chart-head{display:flex;justify-content:space-between;align-items:center;gap:12px;margin-bottom:10px}
-  .chart-head h2{margin:0;font-size:16px}
-  .chart-wrap{position:relative;width:100%;height:440px}
+  #message.ok{color:var(--ok)}
+  .chart-panel{padding:14px;margin-top:14px}
+  .chart-head{display:flex;justify-content:space-between;align-items:center;gap:10px;margin-bottom:10px}
+  .chart-head h2{margin:0;font-size:14px}
+  .chart-wrap{position:relative;width:100%;height:340px}
   canvas{display:block;width:100%;height:100%;border-radius:8px}
   #tooltip{
-    position:absolute;pointer-events:none;display:none;background:rgba(17,24,39,.92);color:#fff;
-    padding:6px 9px;border-radius:6px;font-size:12px;white-space:nowrap;z-index:2;
-    transform:translate(-50%,-130%);box-shadow:0 4px 12px rgba(0,0,0,.18);
+    position:absolute;pointer-events:none;display:none;background:rgba(8,18,30,.94);color:#e6f7fb;
+    border:1px solid rgba(45,212,232,.3);
+    padding:6px 9px;border-radius:6px;font-size:11.5px;white-space:nowrap;z-index:2;
+    transform:translate(-50%,-130%);box-shadow:0 4px 14px rgba(0,0,0,.4);
   }
-  .stats{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-top:14px}
-  .stat{background:#f8fafc;border:1px solid #eef2f7;border-radius:8px;padding:9px 11px;min-width:0}
-  .stat .k{font-size:11px;color:var(--muted);margin-bottom:2px}
-  .stat .v{font-size:14px;font-weight:650;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-  [hidden]{display:none!important}
-  @media(max-width:900px){
-    .layout{grid-template-columns:1fr}
-    .chart-wrap{height:360px}
-    .stats{grid-template-columns:repeat(2,1fr)}
+  .stats{display:grid;grid-template-columns:repeat(2,1fr);gap:8px;margin-top:12px}
+  .stat{background:#0b1320;border:1px solid #1b2a3c;border-radius:8px;padding:8px 10px;min-width:0}
+  .stat .k{font-size:10.5px;color:var(--muted);margin-bottom:2px}
+  .stat .v{font-size:12.5px;font-weight:650;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;color:#dce9f5}
+
+  @media(min-width:860px){
+    .home{padding-top:26px}
+    .lab{max-width:1100px;padding:24px 24px 48px}
+    .lab-layout{display:grid;grid-template-columns:360px 1fr;gap:16px;align-items:start}
+    .chart-panel{margin-top:0}
+    .chart-wrap{height:520px}
+    .stats{grid-template-columns:repeat(4,1fr)}
   }
 </style>
 </head>
 <body>
-<div class="app">
-  <header>
-    <h1>重力 G – 质量 m 关系曲线生成器</h1>
-    <p>录入成对的质量 m（kg）与重力 G（N）数值，点击「生成曲线」即可画出 G–m 关系图。</p>
-  </header>
 
-  <main class="layout">
+<!-- ========== 首页 ========== -->
+<main id="home" class="home">
+  <div class="brand">
+    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+      <path d="M3 4.5 21 4.5 8.5 20 3 4.5Z" stroke="#2dd4e8" stroke-width="1.8" stroke-linejoin="round"/>
+      <path d="M21 4.5 15.5 20 8.5 20" stroke="#22e07a" stroke-width="1.8" stroke-linejoin="round"/>
+      <path d="m5.6 9.5 8.3-.1" stroke="#2dd4e8" stroke-width="1.4" stroke-linecap="round"/>
+    </svg>
+    <span>小徐 · 物理实验室</span>
+  </div>
+
+  <section class="hero">
+    <svg class="wave" viewBox="0 0 360 296" preserveAspectRatio="none" aria-hidden="true">
+      <defs>
+        <linearGradient id="waveGrad" x1="0" y1="0" x2="1" y2="0">
+          <stop offset="0" stop-color="#0891b2"/><stop offset=".5" stop-color="#2dd4e8"/><stop offset="1" stop-color="#67e8f9"/>
+        </linearGradient>
+        <filter id="glow" x="-50%" y="-50%" width="200%" height="200%">
+          <feGaussianBlur stdDeviation="5" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge>
+        </filter>
+        <pattern id="grid" width="40" height="40" patternUnits="userSpaceOnUse">
+          <path d="M40 0H0V40" fill="none" stroke="#2b4260" stroke-opacity=".28" stroke-width="1"/>
+        </pattern>
+      </defs>
+      <rect width="360" height="296" fill="url(#grid)"/>
+      <path d="M-10 198 C 35 205, 65 235, 108 228 S 170 170, 210 198 S 265 240, 302 168 S 345 118, 372 150"
+            fill="none" stroke="url(#waveGrad)" stroke-width="2.2" filter="url(#glow)"/>
+      <circle cx="303" cy="169" r="7" fill="#0a0f18" stroke="#67e8f9" stroke-width="2.2" filter="url(#glow)"/>
+      <circle cx="303" cy="169" r="2.5" fill="#a5f3fc"/>
+    </svg>
+    <div class="hero-content">
+      <span class="tag"><i class="diamond"></i>用曲线读懂物理</span>
+      <h1>看见物理的<br>运行规律</h1>
+      <button class="cta" id="start-experiment" type="button">开始探索 <span aria-hidden="true">→</span></button>
+    </div>
+    <span class="hero-dot-label">G = g(m)</span>
+  </section>
+
+</main>
+
+<!-- ========== 探索学科页 ========== -->
+<main id="subjects" class="lab" hidden>
+  <div class="lab-top">
+    <button class="back" type="button" data-go="home" title="返回首页" aria-label="返回首页">‹</button>
+    <h1>探索学科<small>选择一个学科开始探索</small></h1>
+    <button class="home-link" type="button" data-go="home">首页</button>
+  </div>
+  <h2 class="page-title">探索学科</h2>
+  <div class="subject-grid">
+    <button class="subject" id="subject-mechanics" type="button">
+      <span class="ico">
+        <svg width="19" height="19" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+          <path d="M3 18 9 11l4 4 8-9" stroke="#2dd4e8" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+          <path d="M16 6h5v5" stroke="#2dd4e8" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+      </span>
+      <b>力学</b><span>交互实验</span>
+    </button>
+  </div>
+</main>
+
+<!-- ========== 精选实验页 ========== -->
+<main id="experiments" class="lab" hidden>
+  <div class="lab-top">
+    <button class="back" type="button" data-go="subjects" title="返回探索学科" aria-label="返回探索学科">‹</button>
+    <h1>精选实验<small>力学 · 交互实验</small></h1>
+    <button class="home-link" type="button" data-go="home">首页</button>
+  </div>
+  <h2 class="page-title">精选实验</h2>
+  <button class="exp-card" id="featured-experiment" type="button">
+    <span class="exp-thumb">
+      <svg viewBox="0 0 92 76" aria-hidden="true">
+        <defs><pattern id="tgrid" width="14" height="14" patternUnits="userSpaceOnUse"><path d="M14 0H0V14" fill="none" stroke="#2b6d7a" stroke-opacity=".35"/></pattern></defs>
+        <rect width="92" height="76" fill="#0b2a33"/><rect width="92" height="76" fill="url(#tgrid)"/>
+        <path d="M8 68 78 14" stroke="#2dd4e8" stroke-width="2" stroke-linecap="round"/>
+        <circle cx="50" cy="37" r="3.4" fill="#0b2a33" stroke="#7dd3fc" stroke-width="1.6"/>
+      </svg>
+    </span>
+    <span class="exp-info">
+      <span class="exp-badge">力学 · 入门</span>
+      <b>重力与质量的关系</b>
+    </span>
+  </button>
+  <p class="foot">小徐老师的物理实验室 · 让抽象的物理变得直观</p>
+</main>
+
+<!-- ========== 实验页 ========== -->
+<main id="lab" class="lab" hidden>
+  <div class="lab-top">
+    <button class="back" type="button" data-go="experiments" title="返回精选实验" aria-label="返回精选实验">‹</button>
+    <h1>重力与质量的关系<small>G = g(m) · 用曲线读懂物理</small></h1>
+    <button class="home-link" type="button" data-go="home">首页</button>
+  </div>
+  <div class="lab-intro">录入成对的 <b>质量 m（kg）</b> 与 <b>重力 G（N）</b>，点击「生成曲线」绘制关系图。曲线始终经过原点 (0,0)，只显示第一象限。</div>
+
+  <div class="lab-layout">
     <section class="panel controls">
       <div class="tabs">
         <button class="tab active" id="tab-table" type="button">逐点录入</button>
@@ -149,28 +335,62 @@
         <div class="stat"><div class="k">曲线类型</div><div class="v" id="stat-type">—</div></div>
       </div>
     </section>
-  </main>
-</div>
+  </div>
+</main>
 
 <script>
 (function(){
   'use strict';
   const $ = s => document.querySelector(s);
+
+  /* ---------- 页面导航（分步全页切换） ---------- */
+  const pages = {
+    home: $('#home'),
+    subjects: $('#subjects'),
+    experiments: $('#experiments'),
+    lab: $('#lab')
+  };
+  let currentPage = 'home';
+  function show(page){
+    if(!pages[page]) page = 'home';
+    currentPage = page;
+    Object.keys(pages).forEach(k => { pages[k].hidden = (k !== page); });
+    window.scrollTo(0, 0);
+    let url = location.pathname + location.search;
+    if(page !== 'home') url += '#' + page;
+    try{ history.replaceState(null, '', url); }
+    catch(e){}
+    if(page === 'lab') requestAnimationFrame(() => { draw(); updateStats(0); });
+  }
+  $('#start-experiment').addEventListener('click', () => show('subjects'));
+  $('#subject-mechanics').addEventListener('click', () => show('experiments'));
+  $('#featured-experiment').addEventListener('click', () => show('lab'));
+  document.querySelectorAll('[data-go]').forEach(b => {
+    b.addEventListener('click', () => show(b.getAttribute('data-go')));
+  });
+  window.addEventListener('hashchange', () => {
+    const h = (location.hash || '').replace('#', '');
+    show(pages[h] ? h : 'home');
+  });
+  show((location.hash || '').replace('#', '') || 'home');
+
+  /* ---------- 曲线工具 ---------- */
   const canvas = $('#chart');
   const ctx = canvas.getContext('2d');
   const tooltip = $('#tooltip');
   const message = $('#message');
 
-  let points = [];          // {x, y}
-  let screenPoints = [];    // {x, y, px, py}
+  let points = [];
+  let screenPoints = [];
   let hoverIndex = -1;
-  let dpr = 1;
   let plotBox = null;
 
   const SAMPLE = [
     [0,0],[1,9.8],[2,19.6],[3,29.4],[4,39.2],
     [5,49],[6,58.8],[7,68.6],[8,78.4]
   ];
+
+  const FONT = '-apple-system, "PingFang SC", sans-serif';
 
   function fmt(v){
     if(!isFinite(v)) return '—';
@@ -242,7 +462,6 @@
     }
     if(raw.length < 2) throw new Error('至少需要 2 个有效数据点才能生成曲线。');
 
-    // 按 X 升序排列；相同 X 合并取平均，保证是函数关系
     raw.sort((a, b) => a.x - b.x);
     const merged = [];
     let duplicates = 0;
@@ -254,10 +473,7 @@
         merged.push({x:p.x, sum:p.y, n:1});
       }
     });
-    return {
-      points: merged.map(m => ({x:m.x, y:m.sum / m.n})),
-      duplicates
-    };
+    return { points: merged.map(m => ({x:m.x, y:m.sum / m.n})), duplicates };
   }
 
   function niceStep(range, target){
@@ -275,45 +491,42 @@
   }
 
   function draw(){
+    if(pages.lab.hidden) return;
     const rect = canvas.getBoundingClientRect();
     if(!rect.width || !rect.height) return;
-    dpr = window.devicePixelRatio || 1;
+    const dpr = window.devicePixelRatio || 1;
     canvas.width = Math.round(rect.width * dpr);
     canvas.height = Math.round(rect.height * dpr);
     ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
     const W = rect.width, H = rect.height;
     ctx.clearRect(0, 0, W, H);
-    ctx.fillStyle = '#ffffff';
+    ctx.fillStyle = '#0b1320';
     ctx.fillRect(0, 0, W, H);
 
-    const m = {l:64, r:20, t:22, b:46};
+    const m = {l:56, r:18, t:24, b:44};
     const pw = W - m.l - m.r, ph = H - m.t - m.b;
     plotBox = {x:m.l, y:m.t, w:pw, h:ph};
 
     if(points.length < 2){
-      ctx.fillStyle = '#9ca3af';
-      ctx.font = '14px -apple-system, "PingFang SC", sans-serif';
+      ctx.fillStyle = '#5d6b82';
+      ctx.font = '13px ' + FONT;
       ctx.textAlign = 'center';
       ctx.fillText('请先录入数据，然后点击「生成曲线」', W / 2, H / 2);
       screenPoints = [];
       return;
     }
 
-    // 曲线强制经过原点：把 (0,0) 作为锚点加入曲线数据，但不计入数据点统计
+    // 曲线强制经过原点：(0,0) 作为锚点加入，不计入数据点统计
     const hasOrigin = points.some(p => Math.abs(p.x) < 1e-12 && Math.abs(p.y) < 1e-12);
     const curveData = (hasOrigin ? points.slice() : [{x:0, y:0}].concat(points))
       .sort((a, b) => a.x - b.x);
 
-    // 只显示第一象限：X 和 Y 都从 0 开始，不再出现负数刻度
+    // 只显示第一象限：X、Y 均从 0 开始
     let maxX = 0, maxY = 0;
-    curveData.forEach(p => {
-      maxX = Math.max(maxX, p.x);
-      maxY = Math.max(maxY, p.y);
-    });
+    curveData.forEach(p => { maxX = Math.max(maxX, p.x); maxY = Math.max(maxY, p.y); });
     if(maxX <= 0) maxX = 1;
     if(maxY <= 0) maxY = 1;
-    maxX *= 1.08;
-    maxY *= 1.12;
+    maxX *= 1.08; maxY *= 1.12;
     const minX = 0, minY = 0;
 
     const sx = x => m.l + (x - minX) / (maxX - minX) * pw;
@@ -325,19 +538,17 @@
     const stepY = niceStep(maxY - minY, 6);
     const showGrid = $('#opt-grid').checked;
 
-    ctx.font = '11px -apple-system, "PingFang SC", sans-serif';
-    ctx.strokeStyle = '#eef1f5';
-    ctx.fillStyle = '#8a93a2';
+    ctx.font = '11px ' + FONT;
+    ctx.strokeStyle = '#1e2e42';
+    ctx.fillStyle = '#7f91a8';
     ctx.lineWidth = 1;
 
-    // 横向网格与 Y 轴刻度
     ctx.textAlign = 'right'; ctx.textBaseline = 'middle';
     for(let v = Math.ceil(minY / stepY) * stepY; v <= maxY + stepY * 1e-6; v += stepY){
       const py = sy(v);
       if(showGrid){ ctx.beginPath(); ctx.moveTo(m.l, py); ctx.lineTo(m.l + pw, py); ctx.stroke(); }
       ctx.fillText(tickText(v, stepY), m.l - 9, py);
     }
-    // 纵向网格与 X 轴刻度
     ctx.textAlign = 'center'; ctx.textBaseline = 'top';
     for(let v = Math.ceil(minX / stepX) * stepX; v <= maxX + stepX * 1e-6; v += stepX){
       const px = sx(v);
@@ -345,27 +556,20 @@
       ctx.fillText(tickText(v, stepX), px, m.t + ph + 9);
     }
 
-    // 坐标轴外框
-    ctx.strokeStyle = '#9ca3af'; ctx.lineWidth = 1.2;
+    // 外框 + 真正经过 (0,0) 的坐标轴
+    ctx.strokeStyle = '#2d4055'; ctx.lineWidth = 1.2;
     ctx.beginPath(); ctx.moveTo(m.l, m.t); ctx.lineTo(m.l, m.t + ph); ctx.lineTo(m.l + pw, m.t + ph); ctx.stroke();
-
-    // 真正经过 (0,0) 的坐标轴，让曲线连接到原点一目了然
     const ox = sx(0), oy = sy(0);
-    ctx.strokeStyle = '#6b7280'; ctx.lineWidth = 1.4;
-    if(ox >= m.l && ox <= m.l + pw){
-      ctx.beginPath(); ctx.moveTo(ox, m.t); ctx.lineTo(ox, m.t + ph); ctx.stroke();
-    }
-    if(oy >= m.t && oy <= m.t + ph){
-      ctx.beginPath(); ctx.moveTo(m.l, oy); ctx.lineTo(m.l + pw, oy); ctx.stroke();
-    }
+    ctx.strokeStyle = '#52708a'; ctx.lineWidth = 1.4;
+    if(ox >= m.l && ox <= m.l + pw){ ctx.beginPath(); ctx.moveTo(ox, m.t); ctx.lineTo(ox, m.t + ph); ctx.stroke(); }
+    if(oy >= m.t && oy <= m.t + ph){ ctx.beginPath(); ctx.moveTo(m.l, oy); ctx.lineTo(m.l + pw, oy); ctx.stroke(); }
 
-    ctx.fillStyle = '#6b7280'; ctx.font = '12px -apple-system, "PingFang SC", sans-serif';
+    ctx.fillStyle = '#9fb2c8'; ctx.font = '12px ' + FONT;
     ctx.textAlign = 'right'; ctx.textBaseline = 'top';
     ctx.fillText('m/kg', m.l + pw - 6, m.t + ph + 24);
     ctx.textAlign = 'left'; ctx.textBaseline = 'top';
-    ctx.fillText('G/N', m.l - 24, m.t - 22);
+    ctx.fillText('G/N', m.l - 26, m.t - 22);
 
-    // 曲线路径
     const buildPath = () => {
       const p = curveScreen;
       ctx.beginPath();
@@ -384,10 +588,9 @@
       }
     };
 
-    // 曲线下方渐变填充
     const grad = ctx.createLinearGradient(0, m.t, 0, m.t + ph);
-    grad.addColorStop(0, 'rgba(37,99,235,.20)');
-    grad.addColorStop(1, 'rgba(37,99,235,0)');
+    grad.addColorStop(0, 'rgba(45,212,232,.22)');
+    grad.addColorStop(1, 'rgba(45,212,232,0)');
     ctx.save();
     ctx.beginPath();
     ctx.rect(m.l, m.t, pw, ph);
@@ -399,31 +602,30 @@
     ctx.fillStyle = grad; ctx.fill();
 
     buildPath();
-    ctx.strokeStyle = '#2563eb'; ctx.lineWidth = 2.4;
+    ctx.strokeStyle = '#2dd4e8'; ctx.lineWidth = 2.4;
     ctx.lineJoin = 'round'; ctx.lineCap = 'round';
     ctx.stroke();
 
-    // 数据点
     if($('#opt-points').checked){
       screenPoints.forEach((p, i) => {
         ctx.beginPath();
         ctx.arc(p.px, p.py, i === hoverIndex ? 6 : 4, 0, Math.PI * 2);
-        ctx.fillStyle = '#ffffff'; ctx.fill();
+        ctx.fillStyle = '#0b1320'; ctx.fill();
         ctx.lineWidth = i === hoverIndex ? 3 : 2;
-        ctx.strokeStyle = i === hoverIndex ? '#1e3a8a' : '#2563eb';
+        ctx.strokeStyle = i === hoverIndex ? '#a5f3fc' : '#2dd4e8';
         ctx.stroke();
       });
     }
     ctx.restore();
 
-    // 原点标记：明确显示曲线连到 (0,0)
+    // 原点标记
     if(ox >= m.l && ox <= m.l + pw && oy >= m.t && oy <= m.t + ph){
       ctx.beginPath();
       ctx.arc(ox, oy, 5, 0, Math.PI * 2);
-      ctx.fillStyle = '#1d4ed8'; ctx.fill();
-      ctx.lineWidth = 2; ctx.strokeStyle = '#ffffff'; ctx.stroke();
-      ctx.fillStyle = '#4b5563';
-      ctx.font = '11px -apple-system, "PingFang SC", sans-serif';
+      ctx.fillStyle = '#22d3ee'; ctx.fill();
+      ctx.lineWidth = 2; ctx.strokeStyle = '#0b1320'; ctx.stroke();
+      ctx.fillStyle = '#9fb2c8';
+      ctx.font = '11px ' + FONT;
       const rightSide = ox + 70 < m.l + pw;
       ctx.textAlign = rightSide ? 'left' : 'right';
       ctx.textBaseline = 'bottom';
@@ -431,14 +633,14 @@
     }
 
     // 图例
-    ctx.fillStyle = '#ffffff'; ctx.strokeStyle = '#e5e7eb'; ctx.lineWidth = 1;
-    ctx.fillRect(W - 118, 14, 100, 26);
-    ctx.strokeRect(W - 118, 14, 100, 26);
-    ctx.beginPath(); ctx.moveTo(W - 108, 27); ctx.lineTo(W - 92, 27);
-    ctx.strokeStyle = '#2563eb'; ctx.lineWidth = 2.4; ctx.stroke();
-    ctx.fillStyle = '#4b5563'; ctx.font = '12px -apple-system, "PingFang SC", sans-serif';
+    ctx.fillStyle = '#111c2b'; ctx.strokeStyle = '#2b3a50'; ctx.lineWidth = 1;
+    ctx.fillRect(W - 118, 12, 100, 26);
+    ctx.strokeRect(W - 118, 12, 100, 26);
+    ctx.beginPath(); ctx.moveTo(W - 108, 25); ctx.lineTo(W - 92, 25);
+    ctx.strokeStyle = '#2dd4e8'; ctx.lineWidth = 2.4; ctx.stroke();
+    ctx.fillStyle = '#c3d0e0'; ctx.font = '12px ' + FONT;
     ctx.textAlign = 'left'; ctx.textBaseline = 'middle';
-    ctx.fillText('G = g(m)', W - 86, 27);
+    ctx.fillText('G = g(m)', W - 86, 25);
   }
 
   function updateStats(duplicates){
@@ -467,7 +669,6 @@
     }
   }
 
-  // 事件绑定
   $('#add-row').addEventListener('click', () => addRow());
   $('#generate').addEventListener('click', generate);
 
