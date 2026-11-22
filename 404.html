@@ -46,6 +46,7 @@
     font:inherit;color:var(--text);background:#fff;outline:none;transition:border-color .15s,box-shadow .15s;
   }
   input:focus,textarea:focus{border-color:var(--accent);box-shadow:0 0 0 3px rgba(37,99,235,.12)}
+  input::placeholder{color:#b9c0ca;font-style:italic;opacity:1}
   input.bad{border-color:var(--danger);box-shadow:0 0 0 3px rgba(220,38,38,.1)}
   .del{border:0;background:transparent;color:#9ca3af;cursor:pointer;font-size:18px;line-height:1;border-radius:5px;height:30px}
   .del:hover{background:#fee2e2;color:var(--danger)}
@@ -298,19 +299,27 @@
       return;
     }
 
-    let minX = Infinity, maxX = -Infinity, minY = Infinity, maxY = -Infinity;
-    points.forEach(p => {
-      minX = Math.min(minX, p.x); maxX = Math.max(maxX, p.x);
-      minY = Math.min(minY, p.y); maxY = Math.max(maxY, p.y);
+    // 曲线强制经过原点：把 (0,0) 作为锚点加入曲线数据，但不计入数据点统计
+    const hasOrigin = points.some(p => Math.abs(p.x) < 1e-12 && Math.abs(p.y) < 1e-12);
+    const curveData = (hasOrigin ? points.slice() : [{x:0, y:0}].concat(points))
+      .sort((a, b) => a.x - b.x);
+
+    // 只显示第一象限：X 和 Y 都从 0 开始，不再出现负数刻度
+    let maxX = 0, maxY = 0;
+    curveData.forEach(p => {
+      maxX = Math.max(maxX, p.x);
+      maxY = Math.max(maxY, p.y);
     });
-    const padX = (maxX - minX) || (Math.abs(maxX) * 0.2 || 1);
-    const padY = (maxY - minY) || (Math.abs(maxY) * 0.2 || 1);
-    minX -= padX * 0.08; maxX += padX * 0.08;
-    minY -= padY * 0.12; maxY += padY * 0.12;
+    if(maxX <= 0) maxX = 1;
+    if(maxY <= 0) maxY = 1;
+    maxX *= 1.08;
+    maxY *= 1.12;
+    const minX = 0, minY = 0;
 
     const sx = x => m.l + (x - minX) / (maxX - minX) * pw;
     const sy = y => m.t + ph - (y - minY) / (maxY - minY) * ph;
     screenPoints = points.map(p => ({x:p.x, y:p.y, px:sx(p.x), py:sy(p.y)}));
+    const curveScreen = curveData.map(p => ({x:p.x, y:p.y, px:sx(p.x), py:sy(p.y)}));
 
     const stepX = niceStep(maxX - minX, 7);
     const stepY = niceStep(maxY - minY, 6);
@@ -336,9 +345,20 @@
       ctx.fillText(tickText(v, stepX), px, m.t + ph + 9);
     }
 
-    // 坐标轴
+    // 坐标轴外框
     ctx.strokeStyle = '#9ca3af'; ctx.lineWidth = 1.2;
     ctx.beginPath(); ctx.moveTo(m.l, m.t); ctx.lineTo(m.l, m.t + ph); ctx.lineTo(m.l + pw, m.t + ph); ctx.stroke();
+
+    // 真正经过 (0,0) 的坐标轴，让曲线连接到原点一目了然
+    const ox = sx(0), oy = sy(0);
+    ctx.strokeStyle = '#6b7280'; ctx.lineWidth = 1.4;
+    if(ox >= m.l && ox <= m.l + pw){
+      ctx.beginPath(); ctx.moveTo(ox, m.t); ctx.lineTo(ox, m.t + ph); ctx.stroke();
+    }
+    if(oy >= m.t && oy <= m.t + ph){
+      ctx.beginPath(); ctx.moveTo(m.l, oy); ctx.lineTo(m.l + pw, oy); ctx.stroke();
+    }
+
     ctx.fillStyle = '#6b7280'; ctx.font = '12px -apple-system, "PingFang SC", sans-serif';
     ctx.textAlign = 'right'; ctx.textBaseline = 'top';
     ctx.fillText('m/kg', m.l + pw - 6, m.t + ph + 24);
@@ -347,7 +367,7 @@
 
     // 曲线路径
     const buildPath = () => {
-      const p = screenPoints;
+      const p = curveScreen;
       ctx.beginPath();
       ctx.moveTo(p[0].px, p[0].py);
       if($('#opt-smooth').checked && p.length > 2){
@@ -368,9 +388,13 @@
     const grad = ctx.createLinearGradient(0, m.t, 0, m.t + ph);
     grad.addColorStop(0, 'rgba(37,99,235,.20)');
     grad.addColorStop(1, 'rgba(37,99,235,0)');
+    ctx.save();
+    ctx.beginPath();
+    ctx.rect(m.l, m.t, pw, ph);
+    ctx.clip();
     buildPath();
-    ctx.lineTo(screenPoints[screenPoints.length - 1].px, m.t + ph);
-    ctx.lineTo(screenPoints[0].px, m.t + ph);
+    ctx.lineTo(curveScreen[curveScreen.length - 1].px, m.t + ph);
+    ctx.lineTo(curveScreen[0].px, m.t + ph);
     ctx.closePath();
     ctx.fillStyle = grad; ctx.fill();
 
@@ -390,6 +414,21 @@
         ctx.stroke();
       });
     }
+    ctx.restore();
+
+    // 原点标记：明确显示曲线连到 (0,0)
+    if(ox >= m.l && ox <= m.l + pw && oy >= m.t && oy <= m.t + ph){
+      ctx.beginPath();
+      ctx.arc(ox, oy, 5, 0, Math.PI * 2);
+      ctx.fillStyle = '#1d4ed8'; ctx.fill();
+      ctx.lineWidth = 2; ctx.strokeStyle = '#ffffff'; ctx.stroke();
+      ctx.fillStyle = '#4b5563';
+      ctx.font = '11px -apple-system, "PingFang SC", sans-serif';
+      const rightSide = ox + 70 < m.l + pw;
+      ctx.textAlign = rightSide ? 'left' : 'right';
+      ctx.textBaseline = 'bottom';
+      ctx.fillText('原点 (0,0)', ox + (rightSide ? 9 : -9), oy - 7);
+    }
 
     // 图例
     ctx.fillStyle = '#ffffff'; ctx.strokeStyle = '#e5e7eb'; ctx.lineWidth = 1;
@@ -399,7 +438,7 @@
     ctx.strokeStyle = '#2563eb'; ctx.lineWidth = 2.4; ctx.stroke();
     ctx.fillStyle = '#4b5563'; ctx.font = '12px -apple-system, "PingFang SC", sans-serif';
     ctx.textAlign = 'left'; ctx.textBaseline = 'middle';
-    ctx.fillText('G = f(m)', W - 86, 27);
+    ctx.fillText('G = g(m)', W - 86, 27);
   }
 
   function updateStats(duplicates){
@@ -422,7 +461,7 @@
       tooltip.style.display = 'none';
       draw();
       updateStats(result.duplicates);
-      setMessage('已生成曲线：共 ' + points.length + ' 个有效数据点。' + (result.duplicates ? ' 相同 m 已自动合并取平均。' : ''), 'ok');
+      setMessage('已生成曲线：共 ' + points.length + ' 个有效数据点，曲线已连接至原点 (0,0)。' + (result.duplicates ? ' 相同 m 已自动合并取平均。' : ''), 'ok');
     }catch(err){
       setMessage(err.message, 'error');
     }
